@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Assessee {
+  id           Int           @id @default(autoincrement())
+  pan          String        @unique
+  name         String?
+  lastSyncedOn DateTime?
+  eproceedings EProceeding[]
+}
+
+model EProceeding {
+  id         Int      @id @default(autoincrement())
+  type       String? // FYI or FYA
+  ay         Int?
+  assessee   Assessee @relation(fields: [assesseeId], references: [id])
+  assesseeId Int
+  notices    Notice[]
+}
+
+model Notice {
+  id             Int         @id @default(autoincrement())
+  noticeId       String      @unique
+  section        String? // U/s
+  noticeType     String? // e.g., "Show Cause Notice"
+  noticeDate     DateTime? // Notice Date
+  dueDate        DateTime? // Due Date
+  noticePdfDocId BigInt? // for linking Notice PDF
+  eproceeding    EProceeding @relation(fields: [eproceedingId], references: [id])
+  eproceedingId  Int
+  responses      Response[]
+  documents      Document[]  @relation("NoticeDocuments")
+}
+
+model Response {
+  id           Int        @id @default(autoincrement())
+  status       String?
+  responseDate DateTime?
+  remarks      String?
+  notice       Notice     @relation(fields: [noticeId], references: [id])
+  noticeId     Int
+  documents    Document[] @relation("ResponseDocuments")
+}
+
+model Document {
+  id          Int     @id @default(autoincrement())
+  docId       BigInt  @unique
+  name        String?
+  contentType String?
+  category    String?
+  size        String?
+
+  // Polymorphic relationship
+  notice   Notice? @relation("NoticeDocuments", fields: [noticeId], references: [id])
+  noticeId Int?
+
+  response   Response? @relation("ResponseDocuments", fields: [responseId], references: [id])
+  responseId Int?
+}

@@ -1,0 +1,742 @@
+{
+  "header": {
+    "formName": null
+  },
+  "messages": [],
+  "errors": [],
+  "reqId": null,
+  "loggedInUserId": null,
+  "eProceedingPaginatedRequests": [
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "53477494",
+      "proceedingName": "First Appeal Proceedings",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2019",
+      "financialYr": "2018",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1746067510000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 1,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1746289028000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "facelessFlag": "Y",
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": false,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "53482877",
+      "proceedingName": "First Appeal Proceedings",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2016",
+      "financialYr": "2015",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1746067449000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 1,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1746292670000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "facelessFlag": "Y",
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": false,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "53482371",
+      "proceedingName": "First Appeal Proceedings",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2016",
+      "financialYr": "2015",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1746067270000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 1,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1746067270000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "facelessFlag": "Y",
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": true,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "53485174",
+      "proceedingName": "First Appeal Proceedings",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2019",
+      "financialYr": "2018",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1746067270000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 1,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1746067270000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "facelessFlag": "Y",
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": true,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "53471922",
+      "proceedingName": "First Appeal Proceedings",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2016",
+      "financialYr": "2015",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1746063958000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 1,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1746063958000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "facelessFlag": "Y",
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": true,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "53468519",
+      "proceedingName": "First Appeal Proceedings",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2019",
+      "financialYr": "2018",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1746063958000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 1,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1746063958000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "facelessFlag": "Y",
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": true,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "53466518",
+      "proceedingName": "First Appeal Proceedings",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2019",
+      "financialYr": "2018",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1746060819000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 1,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1746060819000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "facelessFlag": "Y",
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": true,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "53421650",
+      "proceedingName": "First Appeal Proceedings",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2016",
+      "financialYr": "2015",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1746067270000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1745582705000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1745574301000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 2,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1746067270000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "facelessFlag": "Y",
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": false,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "51645898",
+      "proceedingName": "Issue Letter",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2019",
+      "financialYr": "2018",
+      "acknowledgementNo": "651462410024",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1735043272000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 1,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1735043272000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": true,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "49937560",
+      "proceedingName": "Issue Letter",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2016",
+      "financialYr": "2015",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744639422000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1744383191000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744209821000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744207760000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744037173000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1728984499000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 2,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1744383191000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": false,
+      "isFileAppeal": false,
+      "isRectification": false
+    },
+    {
+      "header": {
+        "formName": null
+      },
+      "messages": [],
+      "errors": [],
+      "proceedingReqId": "45479385",
+      "proceedingName": "Issue Letter",
+      "pan": "AACTB3742N",
+      "nameOfAssesse": "BASUKINATH SHIV MANDIR NYAS SAMITY",
+      "itrType": "ITR-5",
+      "assessmentYear": "2019",
+      "financialYr": "2018",
+      "proceedingStatusDetails": [
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1745308412000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1745238879000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744639566000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1744383178000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744209959000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744207902000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744037089000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Submitted",
+          "date": 1744036959000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1742566789000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1737387157000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1737151263000,
+          "completed": true
+        },
+        {
+          "header": {
+            "formName": null
+          },
+          "messages": [],
+          "errors": [],
+          "reqId": null,
+          "loggedInUserId": null,
+          "status": "Open",
+          "date": 1718976968000,
+          "completed": true
+        }
+      ],
+      "viewNoticeCount": 6,
+      "proceedingType": "I",
+      "issuedOn": null,
+      "servedOn": null,
+      "responseDueDate": null,
+      "lastResponseSubmittedOn": 1745238879000,
+      "responseViewedByAoOn": null,
+      "proceedingStatus": "O",
+      "respStatus": null,
+      "respId": null,
+      "commType": null,
+      "readFlag": null,
+      "returnEverified": false,
+      "discardAllowed": false,
+      "invalidationFlag": "N",
+      "new": false,
+      "isFileAppeal": false,
+      "isRectification": false
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: proj1-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db  # <-- Persistent volume
+    networks:
+      - app-network
+
+  api:
+    build:
+      context: ./api
+    container_name: proj1-api
+    volumes:
+      - ./api:/app
+    ports:
+      - "5000:5000"
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/mydatabase
+    command: npm run dev
+
+  ui:
+    build:
+      context: ./ui
+    container_name: proj1-ui
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    networks:
+      - app-network
+    command: npm run dev
+
+volumes:
+  mongo-data:  # <-- This stores MongoDB data outside the container
+
+networks:
+  app-network:
+    driver: bridge

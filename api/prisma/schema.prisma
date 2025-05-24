@@ -1,0 +1,80 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URI")
+}
+
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma-client"
+}
+
+
+model Assessee {
+  id            String         @id @default(auto()) @map("_id") @db.ObjectId
+  pan           String         @unique
+  name          String?
+  lastSyncedOn  DateTime?
+  eproceedings  EProceeding[]
+}
+
+model EProceeding {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  type        String?
+  ay          Int?
+  assessee    Assessee   @relation(fields: [assesseeId], references: [id])
+  assesseeId  String      @db.ObjectId
+  notices     Notice[]
+}
+
+model Notice {
+  id               String      @id @default(auto()) @map("_id") @db.ObjectId
+  noticeId         String      @unique
+  section          String?
+  noticeType       String?
+  noticeDate       DateTime?
+  dueDate          DateTime?
+  noticePdfDocId   BigInt?
+  eproceeding      EProceeding @relation(fields: [eproceedingId], references: [id])
+  eproceedingId    String      @db.ObjectId
+  responses        Response[]
+  documents        Document[]  @relation("NoticeDocuments")
+}
+
+model Response {
+  id           String     @id @default(auto()) @map("_id") @db.ObjectId
+  status       String?
+  responseDate DateTime?
+  remarks      String?
+  notice       Notice     @relation(fields: [noticeId], references: [id])
+  noticeId     String     @db.ObjectId
+  documents    Document[] @relation("ResponseDocuments")
+}
+
+model Document {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  docId         BigInt     @unique
+  name          String?
+  contentType   String?
+  category      String?
+  size          String?
+  notice        Notice?    @relation("NoticeDocuments", fields: [noticeId], references: [id])
+  noticeId      String?    @db.ObjectId
+  response      Response?  @relation("ResponseDocuments", fields: [responseId], references: [id])
+  responseId    String?    @db.ObjectId
+}
+
+
+model Demand {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  assessmentYear     String   // A.Y
+  section            String   // U/s
+  demandRefNo        String   // Demand Reference No
+  dateOfDemand       DateTime
+  taxOrPenalty       Float
+  interestAmount     Float
+  total              Float
+  responsePdf        String   // File path or URL to the PDF
+  assesseeId         String   @db.ObjectId
+  assessee           Assessee @relation(fields: [assesseeId], references: [id])
+}
