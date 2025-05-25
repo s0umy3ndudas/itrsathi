@@ -41,8 +41,7 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         });
 
         await new Promise(resolve => setTimeout(resolve, 5000));
-        await page.screenshot({ path: 'login-page.png' });
-
+ 
         let currentUrl = page.url();
         console.log(`Current page URL: ${currentUrl}`);
 
@@ -76,8 +75,7 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
 
         if (!inputFieldFound) {
             console.log('Could not find input field.');
-            await page.screenshot({ path: 'input-field-missing.png' });
-            throw new Error('User ID input field not found');
+             throw new Error('User ID input field not found');
         }
 
         // Step 3: Click Continue/Login button
@@ -114,8 +112,7 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         }
 
         if (!buttonFound) {
-            await page.screenshot({ path: 'button-missing.png' });
-            throw new Error('Continue/Login button not found');
+             throw new Error('Continue/Login button not found');
         }
 
         // Step 4: Wait for password page
@@ -128,12 +125,10 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         });
 
         if (!passwordPageReached) {
-            await page.screenshot({ path: 'no-password-page.png' });
-            throw new Error('Password page not detected');
+             throw new Error('Password page not detected');
         }
 
-        await page.screenshot({ path: 'password-page.png' });
-
+ 
         // Step 5: Click secure access checkbox
         console.log('Looking for checkbox...');
         const checkboxSelectors = [
@@ -177,8 +172,7 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         }
 
         if (!passwordEntered) {
-            await page.screenshot({ path: 'password-field-missing.png' });
-            throw new Error('Password input not found');
+             throw new Error('Password input not found');
         }
 
         // Step 7: Click login
@@ -237,8 +231,7 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         }
         
         if (!loginButtonClicked) {
-            await page.screenshot({ path: 'login-button-missing.png' });
-            throw new Error('Login button not found');
+             throw new Error('Login button not found');
         }
         
         console.log('Initial login button clicked. Waiting for page update...');
@@ -277,8 +270,7 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
                 return Array.from(errorElements).map(el => el.textContent).join(' ');
             });
         
-            await page.screenshot({ path: 'login-failed.png' });
-        
+         
             if (errorMessage) {
                 throw new Error(`Login failed: ${errorMessage}`);
             } else {
@@ -287,8 +279,7 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         }
         
         console.log('Login successful!');
-        await page.screenshot({ path: 'post-login.png' });
-        
+         
         // Step 4: Save cookies
         const cookies = await page.cookies();
         const cookieHeader = cookies.map(c => `${c.name}=${c.value}`).join('; ');
@@ -410,8 +401,7 @@ if (!fs.existsSync(dotenvDir)) {
 
         } catch (error) {
             console.error(`❌ Attempt ${attempt} failed:`, error.message);
-            await page.screenshot({ path: `fatal-error-attempt-${attempt}.png` });
-            await browser.close();
+             await browser.close();
 
             if (attempt === maxRetries) {
                 console.error('🛑 Max retries reached. Giving up.');
