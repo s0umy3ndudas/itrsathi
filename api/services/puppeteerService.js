@@ -24,9 +24,8 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         console.log(`🌀 Attempt ${attempt} of ${maxRetries}`);
 
         const browser = await puppeteer.launch({
-            executablePath: '/usr/bin/google-chrome', // update path if needed
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox'] // Required on Render and similar platforms
           });
           
 
