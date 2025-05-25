@@ -495,18 +495,22 @@ function sleep(ms) {
 // MongoDB connection string for local setup
 const mongoose = require('mongoose');
 
+// Replace with your actual MongoDB Atlas connection URI
+const mongoURI = 'mongodb+srv://somdas1509:372595130@cluster0.gywlqhj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
-// MongoDB connection string for local setup
-const mongoURI = 'mongodb://proj1-mongodb:27017/mydatabase';
+// Connect to MongoDB
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log('✅ Connected to MongoDB Atlas');
+})
+.catch((err) => {
+  console.error('❌ Error connecting to MongoDB Atlas:', err);
+});
 
-// Connect to MongoDB without deprecated options
-mongoose.connect(mongoURI)
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
-  });
+
 
 app.post('/notices', async (req, res) => {
   try {
