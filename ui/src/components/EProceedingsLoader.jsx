@@ -18,7 +18,7 @@ const ProceedingsTable = ({ pan }) => {
     setExpandedRows([]);
     setExpandAll(false);
     axios
-      .get(`http://localhost:5000/assessee/${pan}/details`)
+      .get(`${import.meta.env.VITE_API_BASE_URL}/assessee/${pan}/details`)
       .then((response) => setData(response.data))
       .catch((error) => console.error('Error fetching data:', error));
   }, [pan]);
@@ -256,7 +256,7 @@ const ProceedingsTable = ({ pan }) => {
                                       onChange={() => handleCheckboxChange(docId)}
                                     />
                                     <a
-                                      href={`http://localhost:5000/naman/eproceedings/${data.assessee.pan}/${docId}.pdf`}
+                                      href={`${import.meta.env.VITE_API_BASE_URL}/naman/eproceedings/${data.assessee.pan}/${docId}.pdf`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="text-blue-600 underline"
@@ -277,7 +277,7 @@ const ProceedingsTable = ({ pan }) => {
                                       onChange={() => handleCheckboxChange(docId)}
                                     />
                                     <a
-                                      href={`http://localhost:5000/naman/eproceedings/${data.assessee.pan}/${docId}.pdf`}
+                                      href={`${import.meta.env.VITE_API_BASE_URL}/naman/eproceedings/${data.assessee.pan}/${docId}.pdf`}
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="text-blue-600 underline"

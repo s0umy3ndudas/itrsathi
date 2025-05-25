@@ -11,7 +11,7 @@ export default function AuditTable({ pan }) {
     const fetchAudits = async () => {
       console.log('🔍 Fetching audits for PAN:', pan);
       try {
-        const res = await fetch(`http://localhost:5000/audit/${pan}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/audit/${pan}`);
         const data = await res.json();
         console.log('✅ Audits fetched:', data);
         setAudits(data || []);

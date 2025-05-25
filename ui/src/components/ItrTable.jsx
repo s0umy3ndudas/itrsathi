@@ -11,7 +11,7 @@ export default function ITRTable({ pan }) {
     const fetchData = async () => {
       console.log('🔍 Fetching ITRs for PAN:', pan);
       try {
-        const res = await fetch(`http://localhost:5000/itr/${pan}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/itr/${pan}`);
         const data = await res.json();
         console.log('✅ ITRs fetched successfully:', data);
         setItrs(data.itrs || []);

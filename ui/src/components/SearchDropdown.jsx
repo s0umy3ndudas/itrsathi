@@ -9,7 +9,7 @@ const SearchableAssesseeDropdown = ({ onSelect }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/assessees')
+    axios.get(`${import.meta.env.VITE_API_BASE_URL}/assessees`)
       .then(res => {
         setAssessees(res.data);
         setFiltered(res.data);

@@ -38,7 +38,7 @@ const AssesseeSelector = () => {
     const { pan, password } = selectedAssessee;
 
     try {
-      const res = await axios.post('http://localhost:5000/api/automation/run', { pan, password });
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/automation/run`, { pan, password });
       const message = res.data.message || '';
 
       if (message === 'FINALLY GOT THE COOKIE') {

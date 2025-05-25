@@ -335,7 +335,7 @@ if (!fs.existsSync(dotenvDir)) {
     console.log('calling for type FYA');
     
     // Call /sync with type: 'FYA'
-    await axios.post(`http://localhost:5000/sync`, {
+    await axios.post(`${process.env.API_URL}/sync`, {
       cookie: cookieHeader,
       pan,
       password,
@@ -346,7 +346,7 @@ if (!fs.existsSync(dotenvDir)) {
     console.log('calling for type FYI');
 
     // Call /sync with type: 'FYI'
-    await axios.post(`http://localhost:5000/sync`, {
+    await axios.post(`${process.env.API_URL}/sync`, {
       cookie: cookieHeader,
       pan,
       password,
@@ -357,7 +357,7 @@ if (!fs.existsSync(dotenvDir)) {
     // Call /demands
     console.log('🔍 Reading all demands');
     
-  await axios.post('http://localhost:5000/demands', {
+  await axios.post(`${process.env.API_URL}/demands`, {
     cookie: cookieHeader,
     pan,
   });
@@ -365,7 +365,7 @@ if (!fs.existsSync(dotenvDir)) {
  // Call /itr
     console.log('🔍 Reading all itrs');
     
-  await axios.post('http://localhost:5000/itr', {
+  await axios.post(`${process.env.API_URL}/itr`, {
     cookie: cookieHeader,
     pan,
   });
@@ -373,7 +373,7 @@ if (!fs.existsSync(dotenvDir)) {
   // call /audit
  console.log('🔍 Reading all audits');
     
-  await axios.post('http://localhost:5000/audit', {
+  await axios.post(`${process.env.API_URL}/audit`, {
     cookie: cookieHeader,
     pan,
   });

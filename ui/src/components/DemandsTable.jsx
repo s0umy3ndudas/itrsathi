@@ -11,7 +11,7 @@ export default function DemandsTable({ pan }) {
     const fetchData = async () => {
       console.log('🔍 Fetching demands for PAN:', pan);
       try {
-        const res = await fetch(`http://localhost:5000/demands?pan=${pan}`);
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/demands?pan=${pan}`);
         const data = await res.json();
         console.log('✅ Data fetched successfully:', data);
         setDemands(data.demands);
@@ -56,7 +56,7 @@ export default function DemandsTable({ pan }) {
                 <td className="border px-2 py-1">
                   {demand.responsePdf ? (
                     <a
-                      href={`http://localhost:5000/naman/eproceedings/${demand.assessee.pan}/${demand.responsePdf}.pdf`}
+                      href={`${import.meta.env.VITE_API_BASE_URL}/naman/eproceedings/${demand.assessee.pan}/${demand.responsePdf}.pdf`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 underline"

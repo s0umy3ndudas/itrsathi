@@ -768,7 +768,7 @@ async function fetchAndSave(eProceedings, cookie, pan) {
       await delay(3000);
 
       const res = await retry(
-        () => axios.post('http://localhost:5000/notices', { cookie, proceedingReqId: ep.proceedingReqId, pan }),
+        () => axios.post(`${process.env.API_URL}/notices`, { cookie, proceedingReqId: ep.proceedingReqId, pan }),
         { cookie, pan } // ← missing
       );
       
@@ -790,7 +790,7 @@ async function fetchAndSave(eProceedings, cookie, pan) {
 
         try {
           const response = await retry(
-            () => axios.post('http://localhost:5000/responses', { cookie, headerSeqNo: n.headerSeqNo, pan }),
+            () => axios.post(`${process.env.API_URL}/responses`, { cookie, headerSeqNo: n.headerSeqNo, pan }),
             { cookie, pan } // ← missing
           );
           
@@ -883,7 +883,7 @@ async function fetchAndSave(eProceedings, cookie, pan) {
 // === Express Endpoint ===
   app.post('/sync', async (req, res) => {
     const { cookie, pan,password, type } = req.body;
-    const baseUrl = 'http://localhost:5000';
+    const baseUrl = `${process.env.API_URL}`;
     const downloadDir = path.join(__dirname, 'downloads');
 
     if (!fs.existsSync(downloadDir)) {
