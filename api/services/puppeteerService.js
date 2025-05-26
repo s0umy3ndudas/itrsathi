@@ -1,43 +1,82 @@
-const puppeteer = require('puppeteer-extra');
+
+const puppeteerExtra = require('puppeteer-extra');
 const StealthPlugin = require('puppeteer-extra-plugin-stealth');
-const axios = require('axios');
+puppeteerExtra.use(StealthPlugin());
+require('dotenv').config();
 
-
-const fs = require('fs');
+const axios = require('axios')
 const path = require('path');
 
-require('dotenv').config(); // Load environment variables from the .env file
-
-
-
-
-puppeteer.use(StealthPlugin());
-console.log('Puppeteer version:', puppeteer.version);
-
- 
-
-
 async function automateLoginAndScrape(pan, password, maxRetries = 3) {
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-
-    const chromePath = path.resolve(
-        '/home/cybernaut/.cache/puppeteer/chrome/linux-136.0.7103.94/chrome-linux64/chrome'
-      );
-      
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-        console.log(`🌀 Attempt ${attempt} of ${maxRetries}`);
-
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    console.log(`🌀 Attempt ${attempt} of ${maxRetries}`);
     
-        const browser = await puppeteer.connect({
-            browserWSEndpoint: `wss://production-sfo.browserless.io?token=2SNpR4ONaJEQwHwf1b1103c7d3c7ba602ffdd8c1eb4b7299c`,
-          });
-          
-          
-
-        const page = await browser.newPage();
-        page.on('console', msg => console.log('PAGE LOG:', msg.text()));
-
+    const browser = await puppeteerExtra.launch({
+        headless: 'new',
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || 
+                       process.env.CHROME_BIN || 
+                       '/usr/bin/chromium-browser',
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu',
+          '--disable-web-security',
+          '--disable-features=VizDisplayCompositor',
+          '--window-size=1280,800',
+          '--no-first-run',
+          '--no-zygote',
+          '--single-process',
+          '--disable-background-timer-throttling',
+          '--disable-backgrounding-occluded-windows',
+          '--disable-renderer-backgrounding',
+          '--disable-background-networking',
+          '--memory-pressure-off',
+          '--max_old_space_size=4096',
+          '--disable-blink-features=AutomationControlled',
+          '--disable-extensions',
+          '--disable-plugins',
+          '--disable-images', // Faster loading
+          '--disable-javascript-harmony-shipping',
+          '--disable-ipc-flooding-protection'
+        ],
+        defaultViewport: {
+          width: 1280,
+          height: 800
+        },
+        timeout: 120000, // Longer timeout for gov sites
+        ignoreDefaultArgs: ['--enable-automation']
+      });
+ 
+      // Your scraping logic here
+      const page = await browser.newPage();
+      
+      // Set longer timeout for cloud environments
+      page.setDefaultTimeout(60000);
+      page.setDefaultNavigationTimeout(60000);
+      
+      // Set a more recent and realistic user agent
+      await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+      
+      // Additional stealth measures for cloud environments
+      await page.setViewport({ width: 1280, height: 800 });
+      
+      // Set realistic headers
+      await page.setExtraHTTPHeaders({
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Upgrade-Insecure-Requests': '1',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-User': '?1',
+        'Sec-Fetch-Dest': 'document'
+      });
+      
       try {
         // Step 1: Navigate to login page
         console.log('Navigating to login page...');
@@ -292,42 +331,19 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
 
 
 // Define the correct path to your .env file
-const dotenvPath = path.join(__dirname, '..', '.env');  // This goes up one directory level
+// const dotenvPath = path.join(__dirname, '..', '.env');  // This goes up one directory level
 
 // Check if the directory exists
-const dotenvDir = path.dirname(dotenvPath);  // Get the directory path of the .env file
-if (!fs.existsSync(dotenvDir)) {
-  console.log(`Directory doesn't exist. Creating directory: ${dotenvDir}`);
-  fs.mkdirSync(dotenvDir, { recursive: true }); // Create the directory if it doesn't exist
-}
+//const dotenvDir = path.dirname(dotenvPath);  // Get the directory path of the .env file
+// if (!fs.existsSync(dotenvDir)) {
+//   console.log(`Directory doesn't exist. Creating directory: ${dotenvDir}`);
+//   fs.mkdirSync(dotenvDir, { recursive: true }); // Create the directory if it doesn't exist
+// }
         if (cookieHeader) {
             console.log(`Found COOKIE: ${cookieHeader}`);
-          
-            let envContent = '';
-            if (fs.existsSync(dotenvPath)) {
-              // Read existing .env content
-              envContent = fs.readFileSync(dotenvPath, 'utf8');
-          
-              // If COOKIE exists, replace it
-              if (/^COOKIE\s*=.*$/m.test(envContent)) {
-                // Replace the existing COOKIE line (with optional quotes)
-                envContent = envContent.replace(/^COOKIE\s*=.*$/m, `COOKIE='${cookieHeader}'`);
-              } else {
-                // Append if COOKIE not present
-                envContent += `\nCOOKIE='${cookieHeader}'\n`;
-              }
-              
-            } else {
-              // Create new .env if it doesn't exist
-              envContent = `COOKIE='${cookieHeader}'\n`;
-            }
-          
-            // Write the content to .env file
-            fs.writeFileSync(dotenvPath, envContent);
-            console.log('✅ COOKIE updated in .env');
- 
-             
- //--------------------
+            
+       
+               //--------------------
  try {
     console.log('calling for type FYA');
     
@@ -380,7 +396,8 @@ if (!fs.existsSync(dotenvDir)) {
  }
 
 
-            return {  message: 'FINALLY GOT THE COOKIE'  };
+
+  
 
           } else {
             console.log('⚠️ No cookie found to save.');

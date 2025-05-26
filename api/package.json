@@ -19,7 +19,7 @@
     "mongodb": "^6.16.0",
     "mongoose": "^8.15.0",
     "path": "^0.12.7",
-    "puppeteer": "^24.9.0",
+    "puppeteer-core": "^24.9.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2"
   },
