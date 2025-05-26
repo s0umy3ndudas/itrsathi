@@ -1,8 +1,9 @@
-FROM node:18-slim
+FROM node:18
 
-# Install required dependencies
+# Add tools
 RUN apt-get update && apt-get install -y \
-    chromium \
+    wget \
+    ca-certificates \
     fonts-liberation \
     libappindicator3-1 \
     libasound2 \
@@ -18,19 +19,14 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
-    wget \
-    ca-certificates \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/*
 
-# Set up workdir and copy files
+# Install dependencies
 WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev
+
 COPY . .
-
-# Install node dependencies
-RUN npm install
-
-# Set env var so Puppeteer knows where to find Chrome
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 CMD ["node", "index.js"]
