@@ -20,13 +20,20 @@ console.log('Puppeteer version:', puppeteer.version);
 async function automateLoginAndScrape(pan, password, maxRetries = 3) {
     const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+
+    const chromePath = path.resolve(
+        '/home/cybernaut/.cache/puppeteer/chrome/linux-136.0.7103.94/chrome-linux64/chrome'
+      );
+      
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         console.log(`🌀 Attempt ${attempt} of ${maxRetries}`);
 
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox'] // Required on Render and similar platforms
-          });
+    
+const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    headless: true,
+  });
           
 
         const page = await browser.newPage();
