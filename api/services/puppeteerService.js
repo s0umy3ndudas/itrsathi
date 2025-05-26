@@ -30,17 +30,17 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
 
     
         const browser = await puppeteer.launch({
-            headless: 'new',
+            headless: true,
             args: [
               '--no-sandbox',
               '--disable-setuid-sandbox',
               '--disable-dev-shm-usage',
-              '--disable-extensions',
               '--disable-gpu',
               '--no-zygote',
               '--single-process',
-            ]
+            ],
           });
+          
           
           
 
