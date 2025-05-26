@@ -883,7 +883,7 @@ async function fetchAndSave(eProceedings, cookie, pan) {
 // === Express Endpoint ===
   app.post('/sync', async (req, res) => {
     const { cookie, pan,password, type } = req.body;
-    const baseUrl = `${process.env.API_URL}`;
+    const baseUrl = process.env.API_URL;
     const downloadDir = path.join(__dirname, 'downloads');
 
     if (!fs.existsSync(downloadDir)) {

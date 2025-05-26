@@ -29,11 +29,19 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         console.log(`🌀 Attempt ${attempt} of ${maxRetries}`);
 
     
-const browser = await puppeteer.launch({
-    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    headless: true,
-  });
+        const browser = await puppeteer.launch({
+            headless: 'new',
+            args: [
+              '--no-sandbox',
+              '--disable-setuid-sandbox',
+              '--disable-dev-shm-usage',
+              '--disable-extensions',
+              '--disable-gpu',
+              '--no-zygote',
+              '--single-process',
+            ]
+          });
+          
           
 
         const page = await browser.newPage();
