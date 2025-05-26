@@ -29,21 +29,9 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
         console.log(`🌀 Attempt ${attempt} of ${maxRetries}`);
 
     
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-accelerated-2d-canvas',
-                '--no-first-run',
-                '--no-zygote',
-               '--single-process',
-                '--disable-gpu'
-              ]
-              
+        const browser = await puppeteer.connect({
+            browserWSEndpoint: `wss://production-sfo.browserless.io?token=2SNpR4ONaJEQwHwf1b1103c7d3c7ba602ffdd8c1eb4b7299c`,
           });
-          
           
           
 
