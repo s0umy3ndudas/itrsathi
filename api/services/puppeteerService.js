@@ -14,10 +14,10 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
     console.log(`🌀 Attempt ${attempt} of ${maxRetries}`);
     
     const browser = await puppeteerExtra.launch({
-        headless: 'new',
-        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || 
-                       process.env.CHROME_BIN || 
-                       '/usr/bin/chromium-browser',
+        headless: 'true',
+        // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || 
+        //                process.env.CHROME_BIN || 
+        //                '/usr/bin/chromium-browser',
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -42,26 +42,23 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
           '--disable-javascript-harmony-shipping',
           '--disable-ipc-flooding-protection'
         ],
-        defaultViewport: {
-          width: 1280,
-          height: 800
-        },
-        timeout: 120000, // Longer timeout for gov sites
-        ignoreDefaultArgs: ['--enable-automation']
+        // defaultViewport: {
+        //   width: 1280,
+        //   height: 800
+        // },
+        // timeout: 120000, // Longer timeout for gov sites
+        // ignoreDefaultArgs: ['--enable-automation']
       });
  
       // Your scraping logic here
       const page = await browser.newPage();
       
-      // Set longer timeout for cloud environments
-      page.setDefaultTimeout(60000);
-      page.setDefaultNavigationTimeout(60000);
+      
       
       // Set a more recent and realistic user agent
       await page.setUserAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
       
-      // Additional stealth measures for cloud environments
-      await page.setViewport({ width: 1280, height: 800 });
+     
       
       // Set realistic headers
       await page.setExtraHTTPHeaders({
