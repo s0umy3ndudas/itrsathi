@@ -15,9 +15,8 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
     
     const browser = await puppeteerExtra.launch({
         headless: 'true',
-        // executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || 
-        //                process.env.CHROME_BIN || 
-        //                '/usr/bin/chromium-browser',
+        executablePath:path.resolve(__dirname, '../chrome-bin/chrome-linux/chrome'),
+
         args: [
           '--no-sandbox',
           '--disable-setuid-sandbox',
@@ -42,12 +41,7 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
           '--disable-javascript-harmony-shipping',
           '--disable-ipc-flooding-protection'
         ],
-        // defaultViewport: {
-        //   width: 1280,
-        //   height: 800
-        // },
-        // timeout: 120000, // Longer timeout for gov sites
-        // ignoreDefaultArgs: ['--enable-automation']
+      
       });
  
       // Your scraping logic here
