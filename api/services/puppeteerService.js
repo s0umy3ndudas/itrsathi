@@ -15,7 +15,8 @@ async function automateLoginAndScrape(pan, password, maxRetries = 3) {
     
     const browser = await puppeteerExtra.launch({
         headless: 'true',
-        executablePath:path.resolve(__dirname, '../chrome-bin/chrome-linux/chrome'),
+        // executablePath:path.resolve(__dirname, '../chrome-bin/chrome-linux/chrome'),
+        // executablePath: path.resolve(__dirname, '../chrome-bin/chrome-win/chrome.exe'),
 
         args: [
           '--no-sandbox',
