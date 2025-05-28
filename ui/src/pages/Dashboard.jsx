@@ -41,7 +41,7 @@ const AssesseeSelector = () => {
       const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/automation/run`, { pan, password });
       const message = res.data.message || '';
 
-      if (message === 'FINALLY GOT THE COOKIE') {
+      if (message === "Login and scrape successful") {
         let percent = 0;
         const interval = setInterval(() => {
           percent += 10;
