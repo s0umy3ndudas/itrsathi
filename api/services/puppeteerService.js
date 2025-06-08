@@ -439,45 +439,7 @@ async function waitForPageStability(page, timeout = 10000) {
     
     return false;
 }
-
-// Enhanced navigation function
-async function navigateWithRetry(page, url, options = {}) {
-    const maxRetries = 3;
-    const defaultOptions = {
-        waitUntil: 'domcontentloaded',
-        timeout: 60000,
-        ...options
-    };
-    
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            console.log(`Navigation attempt ${i + 1} to ${url}`);
-            
-            await page.goto(url, defaultOptions);
-            
-            // Wait for page stability
-            const isStable = await waitForPageStability(page);
-            
-            if (isStable) {
-                console.log('Navigation successful and page is stable');
-                return true;
-            } else {
-                throw new Error('Page is not stable after navigation');
-            }
-            
-        } catch (error) {
-            console.log(`Navigation attempt ${i + 1} failed:`, error.message);
-            
-            if (i === maxRetries - 1) {
-                throw error;
-            }
-            
-            // Wait before retry
-            await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-    }
-}
-
+ 
 
 
 
