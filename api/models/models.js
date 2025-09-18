@@ -1,14 +1,71 @@
 const mongoose = require('mongoose');
 
-//
-// Assessee Schema
-//
+const bcrypt = require("bcrypt");
+
+
+
+const otpSchema = new mongoose.Schema({
+  email: { type: String, index: true, required: true },
+  otp: { type: String, required: true },
+  expiresAt: { type: Number, required: true },
+});
+
+const Otp = mongoose.model('Otp', otpSchema);
+
+
+// User Schema
+
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      unique: true,
+      required: true,
+      lowercase: true,
+      trim: true,
+    },
+    assessees: [{ type: mongoose.Schema.Types.ObjectId, ref: "Assessee" }],
+
+    // ✅ NEW: last synced timestamp (null until first sync)
+    lastSyncedOn: {
+      type: Date,
+      default: null,
+      index: true,
+    },
+  },
+  { timestamps: true }
+);
+
+// 🔐 Hash password before save
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+
+// ✅ Method to compare password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
+};
+const User = mongoose.model('User', userSchema);
+
+
+//assese schema
+
+
+
 const assesseeSchema = new mongoose.Schema({
   pan: { type: String, unique: true, required: true },
-  name: { type: String, required: false },
-  lastSyncedOn: { type: Date, required: false },
-  password: { type: String, required: false } // Add this line
-});
+  name: { type: String },
+  lastSyncedOn: { type: Date },
+  password: { type: String },  // if you store IT portal password
+  users: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ]
+}); 
 
 
 const Assessee = mongoose.model('Assessee', assesseeSchema);
@@ -78,8 +135,8 @@ const itrSchema = new mongoose.Schema({
     required: true
   },
   assessmentYear: { type: String, required: true },              // A.Y
-  itrForm: { type: String, required: true },                      // ITR FORM
-  filingDate: { type: Date, required: true },                     // FILING DATE
+  itrForm: { type: String, required: false },                      // ITR FORM
+  filingDate: { type: Date, required: false },                     // FILING DATE
   currentStatus: { type: String, required: false },               // Current Status
   returnProcessingStatus: { type: String, required: false },      // Return Processing Status
   itrAckPdfUrl: { type: String, required: false },                // ITR Ack PDF
@@ -115,14 +172,17 @@ const Audit = mongoose.model('Audit', auditSchema);
 
 
 
+
 //
 // Export all models
 //
 module.exports = {
+    User,
   Assessee,
   EProceeding,
   Notice,
   Demand,
   Itr,
-  Audit
+  Audit,
+  Otp
 };

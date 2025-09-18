@@ -1,60 +1,75 @@
-# Use Node.js 18 with Debian base for better package support
-FROM node:18-bullseye-slim
+# Use the official Playwright image with all browsers and dependencies
+FROM mcr.microsoft.com/playwright:v1.52.0-jammy
 
-# Set environment variables
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
-ENV CHROME_BIN=/usr/bin/chromium
-
-# Install system dependencies
+# Install additional dependencies for better browser support and GCP compatibility
 RUN apt-get update && apt-get install -y \
-    chromium \
-    chromium-sandbox \
     fonts-liberation \
-    libappindicator3-1 \
+    fonts-noto-color-emoji \
+    fonts-noto-cjk \
+    libnss3 \
+    libxss1 \
     libasound2 \
     libatk-bridge2.0-0 \
-    libdrm2 \
     libgtk-3-0 \
-    libnspr4 \
-    libnss3 \
-    libx11-xcb1 \
-    libxcomposite1 \
-    libxdamage1 \
+    libgbm1 \
     libxrandr2 \
-    xdg-utils \
-    libxss1 \
-    libgconf-2-4 \
-    --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
+    libpangocairo-1.0-0 \
+    libatk1.0-0 \
+    libcairo-gobject2 \
+    libgdk-pixbuf2.0-0 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxi6 \
+    libxtst6 \
+    ca-certificates \
+    curl \
+    --no-install-recommends && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Create app directory
+# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy package.json and package-lock.json first for better caching
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install Node.js dependencies
+RUN npm ci --only=production --no-audit --no-fund
 
-# Copy app source
+# Install Playwright browsers (Chromium for scraping)
+RUN npx playwright install chromium --with-deps
+
+# Copy the rest of the application code
 COPY . .
 
-# Create non-root user for security
-RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
-    && mkdir -p /home/pptruser/Downloads \
-    && chown -R pptruser:pptruser /home/pptruser \
-    && chown -R pptruser:pptruser /app
+# Environment variables for GCP compatibility
+ENV NODE_ENV=production
+ENV PORT=5000
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+ENV DISPLAY=:99
+ENV DEBIAN_FRONTEND=noninteractive
+
+# GCP Cloud Run compatibility
+ENV HOST=0.0.0.0
+
+# Create required directories with proper permissions
+RUN mkdir -p /app/uploads /app/downloads /app/generated /app/responseDocs /tmp && \
+    chmod 755 /app/uploads /app/downloads /app/generated /app/responseDocs /tmp
+
+# Create a non-root user for security (GCP best practice)
+RUN groupadd -r appuser && useradd -r -g appuser -G audio,video appuser && \
+    chown -R appuser:appuser /app && \
+    chown -R appuser:appuser /tmp
 
 # Switch to non-root user
-USER pptruser
+USER appuser
 
-# Expose port (adjust as needed)
+# Expose port 5000 as per your application
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD node -e "console.log('Health check passed')" || exit 1
+# Set proper signal handling for graceful shutdown
+STOPSIGNAL SIGTERM
 
-# Start the application
+# Start the application with proper signal handling
 CMD ["node", "index.js"]

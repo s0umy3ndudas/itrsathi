@@ -3,32 +3,38 @@ const cors = require('cors');
 const axios = require('axios');
 const automationRoutes = require('./routes/automation');
  const path = require('path');
-
- 
+ const fs = require('fs');
+ const {automateLoginAndScrape} = require('./services/puppeteerService')
 const app = express();
+
+const userRoutes = require("./routes/user.route.js");
+const assesseeRoutes = require("./routes/assessee.route.js");
 
  const {Assessee,EProceeding,Notice,Demand,Itr,Audit} = require('./models/models');
 
+ const AWS = require('aws-sdk');
 
- // MongoDB connection string for local setup
+// Initialize S3
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION
+});
+
+// MongoDB connection string for local setup
 const mongoose = require('mongoose');
 
 // Replace with your actual MongoDB Atlas connection URI
 const mongoURI = 'mongodb+srv://somdas1509:372595130@cluster0.gywlqhj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 
 // Connect to MongoDB
-mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(mongoURI)
 .then(() => {
   console.log('✅ Connected to MongoDB Atlas');
 })
 .catch((err) => {
   console.error('❌ Error connecting to MongoDB Atlas:', err);
 });
-
-
 
 
 // Middleware setup
@@ -38,6 +44,484 @@ app.use(express.json());  // for parsing application/json
 require('dotenv').config();
 
 
+const multer = require('multer');
+const csv = require('csv-parser');
+ 
+
+
+
+const upload = multer({ dest: 'uploads/' });
+
+
+
+
+/////redis----------------------------------------------
+
+// const { createClient } = require('redis');
+
+
+
+// const redis = createClient();
+ 
+
+const { Redis } = require('@upstash/redis');
+
+// Basic test route
+app.get('/', (req, res) => {
+  res.send('Hello from Express!');
+});
+
+
+
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+
+const bodyParser = require('body-parser');
+const createQueueRoutes = require('./routes/queue.route.js');
+
+app.use(bodyParser.json());
+
+// Redis client
+
+
+
+// // POST /api/check-pans
+// app.get('/api/assessee/pans', async (req, res) => {
+//   try {
+//     const assessees = await Assessee.find({}, { pan: 1, _id: 0 });
+
+//     const pans = assessees.map(a => a.pan);
+
+//     res.status(200).json({
+//       count: pans.length,
+//       pans
+//     });
+//   } catch (error) {
+//     console.error('Error fetching PANs:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+
+
+// app.post('/api/clear-queue', async (req, res) => {
+//   try {
+//     const keys = await redis.keys('job:*');
+
+//     if (keys.length === 0) {
+//       return res.status(200).json({ message: 'Queue is already empty.' });
+//     }
+
+//     await redis.del(...keys);
+
+//     return res.status(200).json({
+//       message: `Cleared ${keys.length} jobs from the queue.`,
+//       deletedKeys: keys
+//     });
+//   } catch (err) {
+//     console.error('Error clearing queue:', err);
+//     return res.status(500).json({ error: 'Failed to clear queue' });
+//   }
+// });
+
+
+// app.post('/api/upload-pan-json', async (req, res) => {
+//   const panList = req.body;
+//   if (!Array.isArray(panList)) {
+//     return res.status(400).json({ error: 'Expected an array of PAN-password pairs' });
+//   }
+
+//   const cleaned = panList.filter(entry => entry.pan && entry.password)
+//     .map(entry => ({
+//       pan: entry.pan.trim().toUpperCase(),
+//       password: entry.password.trim()
+//     }));
+
+//   const added = [], skipped = [];
+
+//   for (const { pan, password } of cleaned) {
+//     const jobId = `job:${pan}`;
+//     const exists = await redis.exists(jobId);
+
+//     if (!exists) {
+//       await redis.hset(jobId, { pan, password, status: 'in_queue' });
+//       added.push(pan);
+//     } else {
+//       const status = await redis.hget(jobId, 'status');
+      
+//       if (['in_queue', 'processing', 'retry'].includes(status)) {
+//         skipped.push(pan);
+//       } else if (status === 'success' || status === 'wrong_password') {
+//         await redis.hset(jobId, { pan, password, status: 'in_queue' });
+//         added.push(pan);
+//       } else {
+//         skipped.push(pan); // just in case for any unexpected status
+//       }
+//     }
+//   }
+
+//   return res.status(200).json({
+//     message: 'PAN list processed successfully',
+//     addedCount: added.length,
+//     skippedCount: skipped.length,
+//     added,
+//     skipped
+//   });
+// });
+
+
+// app.post('/api/addPan', async (req, res) => {
+//   const { pan, password } = req.body;
+
+//   if (!pan || !password) {
+//     return res.status(400).json({ error: 'pan and password are required' });
+//   }
+
+//   const cleanPan = pan.trim().toUpperCase();
+//   const cleanPassword = password.trim();
+//   const jobId = `job:${cleanPan}`;
+
+//   try {
+//     const exists = await redis.exists(jobId);
+
+//     if (!exists) {
+//       await redis.hset(jobId, {
+//         pan: cleanPan,
+//         password: cleanPassword,
+//         status: 'in_queue'
+//       });
+//       return res.status(200).json({ message: 'New PAN added to queue' });
+//     }
+
+//     const status = await redis.hget(jobId, 'status');
+
+//     if (['in_queue', 'processing', 'retry'].includes(status)) {
+//       return res.status(200).json({ message: `PAN exists with status "${status}", skipped`, skipped: true });
+//     }
+
+//     if (status === 'success' || status === 'wrong_password') {
+//       await redis.hset(jobId, {
+//         pan: cleanPan,
+//         password: cleanPassword,
+//         status: 'in_queue'
+//       });
+//       return res.status(200).json({ message: 'PAN re-queued with status "in_queue"' });
+//     }
+
+//     // For unexpected status
+//     return res.status(200).json({ message: `PAN exists with unknown status "${status}", skipped`, skipped: true });
+
+//   } catch (error) {
+//     console.error('Error processing PAN:', error);
+//     return res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+
+// // Delete job by PAN - using direct key lookup
+// app.post('/api/terminatePan', async (req, res) => {
+//   const { pan } = req.body;
+  
+//   try {
+//     // Create job key directly from PAN
+//     const jobKey = `job:${pan}`;
+    
+//     // Check if job exists
+//     const exists = await redis.exists(jobKey);
+    
+//     if (!exists) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Job not found'
+//       });
+//     }
+    
+//     // Delete the job
+//     await redis.del(jobKey);
+    
+//     res.json({
+//       success: true,
+//       message: 'Job deleted successfully',
+//       pan: pan
+//     });
+    
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error deleting job',
+//       error: error.message
+//     });
+//   }
+// });
+
+
+// app.post('/api/addBacktoQueue', async (req, res) => {
+//   const { pan } = req.body;
+  
+//   try {
+//     // Create job key directly from PAN
+//     const jobKey = `job:${pan}`;
+    
+//     // Check if job exists
+//     const exists = await redis.exists(jobKey);
+    
+//     if (!exists) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Job not found'
+//       });
+//     }
+    
+//     // Update job status to "in_queue"
+//     await redis.hset(jobKey, {
+//       status: 'in_queue',
+//      });
+    
+//     res.json({
+//       success: true,
+//       message: 'Job added back to queue successfully',
+//       pan: pan,
+//       status: 'in_queue'
+//     });
+    
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error updating job status',
+//       error: error.message
+//     });
+//   }
+// });
+
+// app.get('/api/getQueue', async (req, res) => {
+//   try {
+//     const keys = await redis.keys('job:*');
+//     const queue = [];
+
+//     for (const key of keys) {
+//       const job = await redis.hgetall(key);
+//       queue.push({
+//         jobId: key,
+//         ...job
+//       });
+//     }
+
+//     res.status(200).json({
+//       total: queue.length,
+//       queue
+//     });
+
+//   } catch (error) {
+//     console.error('Error fetching queue:', error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// });
+
+app.use("/api/queues", createQueueRoutes(redis));  
+app.use("/api/users", userRoutes);
+app.use("/api/assessees", assesseeRoutes);
+
+
+// worker/queueWorker.js
+const MAX_PARALLEL_USERS = 5;          // tune as you like
+const GLOBAL_LOCK_KEY = "lock:worker"; // optional global lock per cycle
+const GLOBAL_LOCK_TTL = 25_000;        // ms
+const USER_LOCK_TTL = 120_000;         // ms — should exceed typical job runtime
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// Extract userId from key: job:<userId>:<PAN>
+function parseUserId(jobKey) {
+  // job:<userId>:<PAN>
+  const parts = jobKey.split(":");
+  // ["job", "<userId>", "<PAN>"]
+  return parts.length >= 3 ? parts[1] : null;
+}
+
+// Get 1 job we can process for a user (in_queue first, else retry)
+async function selectJobForUser(redis, userId) {
+  const keys = await redis.keys(`job:${userId}:*`);
+  if (!keys.length) return null;
+
+  // If ANY job is already processing for this user, skip
+  for (const key of keys) {
+    const job = await redis.hgetall(key);
+    if (job && job.status === "processing") {
+      return null;
+    }
+  }
+
+  // Priority 1: in_queue
+  for (const key of keys) {
+    const job = await redis.hgetall(key);
+    if (job && job.status === "in_queue") return { key, job };
+  }
+
+  // Priority 2: retry
+  for (const key of keys) {
+    const job = await redis.hgetall(key);
+    if (job && job.status === "retry") return { key, job };
+  }
+
+  return null;
+}
+
+// Process a single user's next job (with per-user lock)
+async function processOneUser(redis, userId, automateLoginAndScrape) {
+  const userLockKey = `lock:user:${userId}`;
+
+  // Acquire per-user lock
+  const gotLock = await redis.set(userLockKey, "locked", { NX: true, PX: USER_LOCK_TTL });
+  if (!gotLock) {
+    console.log(`⏭️  User ${userId}: lock held by another worker, skipping`);
+    return;
+  }
+
+  try {
+    // Clean invalid jobs for this user
+    const keys = await redis.keys(`job:${userId}:*`);
+    for (const key of keys) {
+      const job = await redis.hgetall(key);
+      if (!job?.pan || !job?.password) {
+        console.log(`🗑️  Removing invalid job ${key} (missing pan/password)`);
+        await redis.del(key);
+      }
+    }
+
+    // Re-select one eligible job
+    const selected = await selectJobForUser(redis, userId);
+    if (!selected) {
+      console.log(`📭 User ${userId}: no eligible jobs (in_queue/retry) or already processing`);
+      return;
+    }
+
+    const { key, job } = selected;
+
+    // Mark processing
+    await redis.hset(key, {
+      status: "processing",
+      processingAt: Date.now().toString(),
+    });
+    console.log(`🟡 ${key} → processing`);
+
+    let result = {};
+    try {
+      result = await automateLoginAndScrape(job.pan, job.password);
+      console.log(`📝 ${key} result:`, result);
+    } catch (e) {
+      console.log(`❌ ${key} thrown error: ${e.message}`);
+      result = { success: false, message: e.message };
+    }
+
+    // Decide final status
+    if (result?.success && result?.message === "Login and scrape successful") {
+      await redis.hset(key, { status: "success", finishedAt: Date.now().toString() });
+      console.log(`✅ ${key} → success`);
+    } else if (
+      result?.message === "wrong password" ||
+      result?.message === "Login verification failed (no error message detected)"
+    ) {
+      await redis.hset(key, { status: "wrong_password", finishedAt: Date.now().toString() });
+      console.log(`❌ ${key} → wrong_password`);
+    } else {
+      await redis.hset(key, { status: "retry", finishedAt: Date.now().toString() });
+      console.log(`🔁 ${key} → retry`);
+    }
+  } finally {
+    // Always release per-user lock
+    await redis.del(userLockKey);
+  }
+}
+
+// Simple concurrency limiter for per-user tasks
+async function runWithConcurrency(tasks, limit = MAX_PARALLEL_USERS) {
+  const queue = [...tasks];
+  const running = new Set();
+
+  async function runNext() {
+    if (queue.length === 0) return;
+    const fn = queue.shift();
+    const p = fn().finally(() => running.delete(p));
+    running.add(p);
+    if (running.size >= limit) {
+      await Promise.race(running);
+    }
+    return runNext();
+  }
+
+  const starters = Array(Math.min(limit, queue.length)).fill(0).map(runNext);
+  await Promise.all(starters);
+  // Wait any stragglers
+  await Promise.allSettled(Array.from(running));
+}
+
+async function processQueueMultiUser() {
+  console.log("====================================");
+  console.log("🕐 Queue polling started at", new Date().toLocaleTimeString());
+  console.log("====================================");
+
+  // (Optional) prevent overlapping cycles of THIS process
+  const globalLock = await redis.set(GLOBAL_LOCK_KEY, "locked", { NX: true, PX: GLOBAL_LOCK_TTL });
+  if (!globalLock) {
+    console.log("⏳ Another cycle is already running in this worker. Skipping...\n");
+    return;
+  }
+
+  try {
+    // 1) Gather all jobs
+    const allKeys = await redis.keys("job:*");
+    if (!allKeys.length) {
+      console.log("📭 No jobs in queue.");
+      return;
+    }
+
+    // 2) Group keys by userId
+    const users = new Map(); // userId -> array of keys
+    for (const key of allKeys) {
+      const userId = parseUserId(key);
+      if (!userId) continue;
+      if (!users.has(userId)) users.set(userId, []);
+      users.get(userId).push(key);
+    }
+
+    if (users.size === 0) {
+      console.log("📭 No parsable user jobs.");
+      return;
+    }
+
+    console.log(`👥 Found ${users.size} user(s) with jobs`);
+
+    // 3) For each user, create a task that processes ONE job (with per-user lock)
+    const tasks = [];
+    for (const userId of users.keys()) {
+      tasks.push(async () => {
+        await processOneUser(redis, userId, automateLoginAndScrape);
+      });
+    }
+
+    // 4) Run per-user tasks with limited concurrency
+    await runWithConcurrency(tasks, MAX_PARALLEL_USERS);
+
+    console.log("✅ Multi-user polling cycle completed.\n");
+  } catch (err) {
+    console.error("❌ Error in multi-user cycle:", err);
+  } finally {
+    await redis.del(GLOBAL_LOCK_KEY);
+  }
+}
+
+// Run every 30 seconds
+setInterval(processQueueMultiUser, 30_000);
+
+
+
+
+ 
+
+
 // Serve static files under /naman/* from the api/naman directory
 app.use('/naman', express.static(path.join(__dirname, 'naman')));
 
@@ -45,6 +529,8 @@ app.use('/naman', express.static(path.join(__dirname, 'naman')));
 app.get('/', (req, res) => {
   res.send('PDF server running...');
 });
+
+
 
 
 let cookie = process.env.COOKIE;
@@ -58,7 +544,7 @@ if (cookie?.startsWith("'") && cookie?.endsWith("'")) {
 // Attach the automation routes
 app.use('/api/automation', automationRoutes);
 
-const fs = require('fs');
+
  // Ensure the directory exists
 const downloadDir = path.join(__dirname, 'responseDocs');
 if (!fs.existsSync(downloadDir)) {
@@ -67,12 +553,9 @@ if (!fs.existsSync(downloadDir)) {
 
 
 
+///// sync endpoint and functions
 
-
-
-//////////// SYNC 
-
-// === SYNC Endpoints and functions ===
+// === sync Endpoint ===
 app.post('/sync', async (req, res) => {
   const { cookie, pan,password, type } = req.body;
   const baseUrl = process.env.API_URL;
@@ -156,7 +639,8 @@ const assessee = await Assessee.findOneAndUpdate(
 
 
 
-//---
+
+//
 app.post('/eproceedings', async (req, res) => {
   const { cookie, pan, pageNo = 1, type } = req.body;
 
@@ -202,228 +686,50 @@ app.post('/eproceedings', async (req, res) => {
   }
 });
 
-//fn
-async function fetchAndSave(eProceedings, cookie, pan) {
-  let assessee;
 
-  if (eProceedings.length > 0) {
-    assessee = await Assessee.findOneAndUpdate(
-      { pan },
-      {
-        pan,
-        name: eProceedings[0].nameOfAssesse,
-        lastSyncedOn: new Date()
-      },
-      { upsert: true, new: true }
-    );
-  }
-
-  for (const ep of eProceedings) {
-    try {
-      console.log(`📂 Processing eProceeding: ${ep.proceedingReqId}`);
-
-      const eDoc = await EProceeding.findOneAndUpdate(
-        { id: ep.proceedingReqId },
-        {
-          id: ep.proceedingReqId,
-          type: ep.proceedingStatus,
-          ay: ep.assessmentYear,
-          assesseeId: assessee._id,
-          name: ep.proceedingName,
-          date: new Date(ep.responseDueDate || Date.now())
-        },
-        { upsert: true, new: true }
-      );
-
-      await delay(3000);
-
-      const res = await retry(
-        () => axios.post(`${process.env.API_URL}/notices`, { cookie, proceedingReqId: ep.proceedingReqId, pan }),
-        { cookie, pan } // ← missing
-      );
-      
-
-      const notices = res.data || [];
-      console.log(`📎 Notices found: ${notices.length}`);
-
-      for (const n of notices) {
-        const noticedocs = [];
-        const resdocs = [];
-
-        // === Fetch Responses ===
-        if (!n.headerSeqNo) {
-          console.warn(`⚠️ Skipping responses for ${ep.proceedingReqId}: Missing headerSeqNo`);
-          continue;
-        }
-
-        await delay(2000);
-
-        try {
-          const response = await retry(
-            () => axios.post(`${process.env.API_URL}/responses`, { cookie, headerSeqNo: n.headerSeqNo, pan }),
-            { cookie, pan } // ← missing
-          );
-          
-
-          const attachments = response.data?.respRemrkAttLst?.[0]?.attachmentLst || [];
-          for (const att of attachments) {
-            if (att?.docId) {
-              const docId = att.docId.toString();
-              resdocs.push(docId);
-              await savePdfByDocId(docId, cookie, pan);
-              await delay(1500); // Delay between each PDF download
-            }
-          }
-        } catch (err) {
-          console.error(`⚠️ Failed to fetch response with headerSeq ${n.headerSeqNo}:`, 'headerSeq error: ' + err.message);
-        }
-
-        await delay(2000);
-
-        // === Fetch Notice PDF ===
-        try {
-          const noticePdfRes = await retry(
-            () => axios.post(
-              'https://eportal.incometax.gov.in/iec/returnservicesapi/auth/saveEntity',
-              {
-                serviceName: 'noticeletterpdf',
-                headerSeqNo: n.headerSeqNo,
-                procdngReqId: ep.proceedingReqId,
-                loggedInUserId: pan,
-                header: { formName: 'FO-041_PCDNG' }
-              },
-              {
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Accept': 'application/json, text/plain, */*',
-                  'Origin': 'https://eportal.incometax.gov.in',
-                  'Referer': 'https://eportal.incometax.gov.in/iec/foservices/',
-                  'User-Agent': 'Mozilla/5.0',
-                  'Cookie': cookie
-                }
-              }
-            ),
-            { cookie, pan } // ← missing
-          );
-          
-
-          const satDocId = noticePdfRes.data?.satDocId;
-          if (satDocId) {
-            noticedocs.push(satDocId.toString());
-            await savePdfByDocId(satDocId.toString(), cookie, pan);
-          }
-        } catch (err) {
-          console.error(`⚠️ Failed to fetch notice PDF for ${ep.proceedingReqId}:`, err.message);
-        }
-
-        await delay(1500);
-
-        // === Save Notice ===
-        try {
-          await Notice.findOneAndUpdate(
-            { noticeNumber: n.documentReferenceId },
-            {
-              eProceedingId: eDoc._id,
-              us: n.noticeSection || '',
-              type: n.description || '',
-              noticeNumber: n.documentReferenceId,
-              noticeDate: n.issuedOn ? new Date(n.issuedOn) : null,
-              dueDate: n.responseDueDate ? new Date(n.responseDueDate) : null,
-              status: n.isSubmitted,
-              responseStatus: n.respStatus || '',
-              responseDate: n.issuedOn ? new Date(n.issuedOn) : null,
-              noticeDocs: noticedocs,
-              resDocs: resdocs
-            },
-            { upsert: true, new: true }
-          );
-          console.log(`✅ Saved notice: ${n.documentReferenceId}`);
-        } catch (noticeErr) {
-          console.error(`❌ Failed to save notice ${n.documentReferenceId}`, noticeErr.message);
-        }
-      }
-    } catch (err) {
-      console.error(`❌ Failed to process eProceeding ${ep.proceedingReqId}`, err.message);
-    }
-
-    await delay(3000); // Delay between proceedings
-  }
-}
-
-
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-  
-
-
-
-/**
- * Retry wrapper with session extension logic.
- */
-const retry = async (fn, {
-  retries = 3,
-  delayMs = 2000,
-  cookie,
-  pan,
-} = {}) => {
-  for (let i = 0; i < retries; i++) {
-    try {
-      return await fn();
-    } catch (err) {
-      console.warn(`❌ Attempt ${i + 1} failed: ${err.message}`);
-
-      // On failure, attempt to extend session
-      if (cookie && pan) {
-        await extendSession(cookie, pan);
-      }
-
-      if (i < retries - 1) {
-        console.log(`🔁 Retrying in ${delayMs}ms...`);
-        await delay(delayMs);
-      } else {
-        throw err;
-      }
-    }
-  }
-};
-
-
-const extendSession = async (cookie, pan) => {
+// reponse
+app.post('/responses', async (req, res) => {
   try {
-    const res = await axios.post(
-      'https://eportal.incometax.gov.in/iec/loginapi/auth/extendSession',
-      { loggedInUserId: pan },
-      {
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Accept-Encoding': 'gzip, deflate, br, zstd',
-          'Accept-Language': 'en-US,en;q=0.9,bn;q=0.8',
-          'Connection': 'keep-alive',
-          'Content-Type': 'application/json',
-          'Cookie': cookie,
-          'Origin': 'https://eportal.incometax.gov.in',
-          'Referer': 'https://eportal.incometax.gov.in/iec/foservices/',
-          'Sec-Ch-Ua': '"Not.A/Brand";v="99", "Chromium";v="136"',
-          'Sec-Ch-Ua-Mobile': '?1',
-          'Sec-Ch-Ua-Platform': '"Android"',
-          'Sec-Fetch-Dest': 'empty',
-          'Sec-Fetch-Mode': 'cors',
-          'Sec-Fetch-Site': 'same-origin',
-          'Sn': 'NA',
-          'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Mobile Safari/537.36',
-        }
+    const { cookie, pan, headerSeqNo } = req.body;
+
+    const payload = {
+      serviceName: "itbaResponseService",
+      headerSeqNo,
+      pan,
+      header: {
+        formName: "FO-041_PCDNG"
       }
+    };
+
+    const headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json, text/plain, */*',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+      'Origin': 'https://eportal.incometax.gov.in',
+      'Referer': 'https://eportal.incometax.gov.in/iec/foservices/',
+      'Cookie': cookie
+    };
+
+    const response = await axios.post(
+      'https://eportal.incometax.gov.in/iec/returnservicesapi/auth/getEntity',
+      payload,
+      { headers }
     );
-    console.log(`🔄 Session extended for PAN ${pan}:`, res.status);
-  } catch (err) {
-    console.warn(`⚠️ Failed to extend session: ${err.message}`);
+
+    res.json(response.data);
+
+  } catch (error) {
+    console.error('Error:', error.message);
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      res.status(error.response.status).json({ error: error.response.data });
+    } else {
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
-};
+});
 
-
-
+// notice
 app.post('/notices', async (req, res) => {
   try {
     const { cookie, proceedingReqId, pan } = req.body; // accept cookie from frontend
@@ -468,50 +774,7 @@ app.post('/notices', async (req, res) => {
   }
 });
 
-// reponse
-app.post('/responses', async (req, res) => {
-  try {
-    const { cookie, pan, headerSeqNo } = req.body;
-
-    const payload = {
-      serviceName: "itbaResponseService",
-      headerSeqNo,
-      pan,
-      header: {
-        formName: "FO-041_PCDNG"
-      }
-    };
-
-    const headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json, text/plain, */*',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
-      'Origin': 'https://eportal.incometax.gov.in',
-      'Referer': 'https://eportal.incometax.gov.in/iec/foservices/',
-      'Cookie': cookie
-    };
-
-    const response = await axios.post(
-      'https://eportal.incometax.gov.in/iec/returnservicesapi/auth/getEntity',
-      payload,
-      { headers }
-    );
-
-    res.json(response.data);
-
-  } catch (error) {
-    console.error('Error:', error.message);
-    if (error.response) {
-      console.error('Response data:', error.response.data);
-      res.status(error.response.status).json({ error: error.response.data });
-    } else {
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  }
-});
-
-
-
+  
 //download file
 
 app.post('/docs', async (req, res) => {
@@ -553,6 +816,63 @@ app.post('/docs', async (req, res) => {
   }
 });
 
+
+// get account details
+app.post('/getName', async (req, res) => {
+  const { pan, cookie } = req.body;
+
+  if (!pan || !cookie) {
+    return res.status(400).json({ error: 'PAN and Cookie are required' });
+  }
+
+  console.log('📩 Received PAN and Cookie for PAN Details fetch');
+  console.log('➡️ PAN:', pan);
+
+  try {
+    const response = await axios.post(
+      'https://eportal.incometax.gov.in/iec/servicesapi/auth/saveEntity',
+      {
+        serviceName: 'myPanDetailsService',
+        contactPan: pan,
+        userId: pan
+      },
+      {
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Content-Type': 'application/json',
+          'Cookie': cookie,
+          'Origin': 'https://eportal.incometax.gov.in',
+          'Referer': 'https://eportal.incometax.gov.in/iec/foservices/',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36'
+        }
+      }
+    );
+
+    console.log('✅ PAN details fetched successfully');
+    return res.status(200).json({
+      message: 'PAN details fetched successfully',
+      data: response.data
+    });
+  } catch (err) {
+    console.error('❌ Error fetching PAN details:', err.message);
+    return res.status(500).json({ error: 'Failed to fetch PAN details' });
+  }
+});
+
+
+/**
+ * Downloads a PDF by docId from the e-portal and stores it under naman/eproceedings/<PAN>.
+ * @param {string} docId - The document ID.
+ * @param {string} cookie - Cookie header string (from browser session).
+ * @param {string} pan - PAN number used for directory structure.
+ */
+
+
+
+/// demand
+ 
+/// 🚀 POST /demands - Fetch & Save Outstanding Demands
+/// 🚀 POST /demands - Fetch & Save Outstanding Demands
 
 //-------------------------------demands
 
@@ -650,6 +970,8 @@ app.post('/demands', async (req, res) => {
     });
   }
 });
+
+
 
 //------------------------------------itrs
 app.post('/itr', async (req, res) => {
@@ -878,61 +1200,52 @@ app.post('/audit', async (req, res) => {
 
 
 
-// Create Assessee and EProceedings
-app.post('/assessee-with-proceedings', async (req, res) => {
-  const { pan, name, lastSyncedOn, proceedings } = req.body;
 
-  if (!pan || !Array.isArray(proceedings)) {
-    return res.status(400).json({ error: 'PAN and proceedings are required.' });
-  }
-
-  try {
-    // Check if Assessee exists, else create one
-    let assessee = await Assessee.findOne({ pan });
-    if (!assessee) {
-      assessee = await Assessee.create({ pan, name, lastSyncedOn });
-    }
-
-    // Insert each proceeding linked to assesseeId
-    const createdProceedings = [];
-    for (const p of proceedings) {
-      if (!p.type || !p.ay) continue;
-      const newP = await EProceeding.create({
-        type: p.type,
-        ay: p.ay,
-        assesseeId: assessee._id,
-      });
-      createdProceedings.push(newP);
-    }
-
-    return res.status(201).json({
-      message: 'Assessee and proceedings created',
-      assessee,
-      proceedings: createdProceedings,
-    });
-  } catch (err) {
-    console.error('Error:', err.message);
-    return res.status(500).json({ error: 'Server error' });
-  }
-});
-
-//
+//////#################################################
 
 
-// POST /notices
-// POST /notices
+
+//////#################################################
+
+
+//sync 
+// Utility sleep function
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+
+//----------------------------------------------------------------
+
+// Function to save proceedings data to database
+// Function to save proceedings data to database
+
+
+
+
+// Function to save proceedings data to database
+  
+
+///-------------------------------
 
 
 
 
 
-
-
-
-/// demand
  
-/// 🚀 POST /demands - Fetch & Save Outstanding Demands
-/// 🚀 POST /demands - Fetch & Save Outstanding Demands
+ 
+ 
+
+
+  
+ 
+// Delay utility
+ 
+
+
+
+
 
 
 
@@ -1003,143 +1316,6 @@ app.delete('/itr', async (req, res) => {
   }
 });
 
-
-
-//sync 
-// Utility sleep function
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-
-
-//----------------------------------------------------------------
-
-// Function to save proceedings data to database
-// Function to save proceedings data to database
-
-
-
-
-// Function to save proceedings data to database
-  
-
-///-------------------------------
-
-
-
-
-
-
- 
- 
-
-
-  
- 
-// Delay utility
- 
-
-
-
-// get account details
-app.post('/getName', async (req, res) => {
-  const { pan, cookie } = req.body;
-
-  if (!pan || !cookie) {
-    return res.status(400).json({ error: 'PAN and Cookie are required' });
-  }
-
-  console.log('📩 Received PAN and Cookie for PAN Details fetch');
-  console.log('➡️ PAN:', pan);
-
-  try {
-    const response = await axios.post(
-      'https://eportal.incometax.gov.in/iec/servicesapi/auth/saveEntity',
-      {
-        serviceName: 'myPanDetailsService',
-        contactPan: pan,
-        userId: pan
-      },
-      {
-        headers: {
-          'Accept': 'application/json, text/plain, */*',
-          'Content-Type': 'application/json',
-          'Cookie': cookie,
-          'Origin': 'https://eportal.incometax.gov.in',
-          'Referer': 'https://eportal.incometax.gov.in/iec/foservices/',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36'
-        }
-      }
-    );
-
-    console.log('✅ PAN details fetched successfully');
-    return res.status(200).json({
-      message: 'PAN details fetched successfully',
-      data: response.data
-    });
-  } catch (err) {
-    console.error('❌ Error fetching PAN details:', err.message);
-    return res.status(500).json({ error: 'Failed to fetch PAN details' });
-  }
-});
-
-
-
-/**
- * Downloads a PDF by docId from the e-portal and stores it under naman/eproceedings/<PAN>.
- * @param {string} docId - The document ID.
- * @param {string} cookie - Cookie header string (from browser session).
- * @param {string} pan - PAN number used for directory structure.
- */
-async function savePdfByDocId(docId, cookie, pan) {
-  const url = `https://eportal.incometax.gov.in/iec/document/${docId}`;
-  const headers = {
-    'Accept': 'application/json, text/plain, */*',
-    'Accept-Encoding': 'gzip, deflate, br, zstd',
-    'Accept-Language': 'en-US,en;q=0.9',
-    'Connection': 'keep-alive',
-    'Content-Type': 'application/json',
-    'Cookie': cookie,
-    'Referer': 'https://eportal.incometax.gov.in/iec/foservices/',
-    'Sec-Ch-Ua': '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"',
-    'Sec-Ch-Ua-Mobile': '?0',
-    'Sec-Ch-Ua-Platform': '"Windows"',
-    'Sec-Fetch-Dest': 'empty',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-origin',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36'
-  };
-
-  try {
-    const response = await retry(
-      () => axios.get(url, { headers, responseType: 'arraybuffer' }),
-      { cookie, pan } // ← THIS was missing
-    );
-    
-
-    const dirPath = path.join(__dirname, 'naman', 'eproceedings', pan);
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
-
-    const filePath = path.join(dirPath, `${docId}.pdf`);
-    fs.writeFileSync(filePath, response.data);
-    console.log(`✅ Saved PDF to: ${filePath}`);
-  } catch (error) {
-    console.error(`❌ Failed to download docId ${docId} for PAN ${pan}:`, error.message);
-  }
-}
- 
-
-
-
-
-
-
-// Main logic
-
-
  
 app.get('/assessee/:pan/details', async (req, res) => {
   try {
@@ -1189,19 +1365,46 @@ app.get('/api/assessee', async (req, res) => {
 });
 
 
+// Create Assessee and EProceedings
+app.post('/assessee-with-proceedings', async (req, res) => {
+  const { pan, name, lastSyncedOn, proceedings } = req.body;
 
-//----------------
-app.get('/assessees', async (req, res) => {
+  if (!pan || !Array.isArray(proceedings)) {
+    return res.status(400).json({ error: 'PAN and proceedings are required.' });
+  }
+
   try {
-    const assessees = await Assessee.find().sort({ name: 1 }); // sorted alphabetically by name
-    res.status(200).json(assessees);
-  } catch (error) {
-    console.error('❌ Failed to fetch assessees:', error.message);
-    res.status(500).json({ message: 'Failed to fetch assessees', error: error.message });
+    // Check if Assessee exists, else create one
+    let assessee = await Assessee.findOne({ pan });
+    if (!assessee) {
+      assessee = await Assessee.create({ pan, name, lastSyncedOn });
+    }
+
+    // Insert each proceeding linked to assesseeId
+    const createdProceedings = [];
+    for (const p of proceedings) {
+      if (!p.type || !p.ay) continue;
+      const newP = await EProceeding.create({
+        type: p.type,
+        ay: p.ay,
+        assesseeId: assessee._id,
+      });
+      createdProceedings.push(newP);
+    }
+
+    return res.status(201).json({
+      message: 'Assessee and proceedings created',
+      assessee,
+      proceedings: createdProceedings,
+    });
+  } catch (err) {
+    console.error('Error:', err.message);
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
 
+ 
 
 
 // Get all audits for a specific PAN
@@ -1226,23 +1429,170 @@ app.get('/audit/:pan', async (req, res) => {
 });
 
 
+const bucketName = 'playwright-docs';
+
 
 /// delete assesse
-
 app.delete('/delAssessee/:pan', async (req, res) => {
   const { pan } = req.params;
 
   try {
-    const result = await Assessee.findOneAndDelete({ pan: pan });
-
-    if (!result) {
+    // Step 1: Find assessee by PAN
+    const assessee = await Assessee.findOne({ pan });
+    if (!assessee) {
       return res.status(404).json({ message: 'Assessee not found' });
     }
 
-    res.json({ message: 'Assessee deleted successfully', deleted: result });
+    const assesseeId = assessee._id;
+
+    // Step 2: Find all EProceedings for this assessee
+    const eProceedings = await EProceeding.find({ assesseeId });
+    const eProceedingIds = eProceedings.map(e => e._id);
+
+    // Step 3: Delete all related DB records
+    const [
+      deletedNotices,
+      deletedEProceedings,
+      deletedDemands,
+      deletedItrs,
+      deletedAudits
+    ] = await Promise.all([
+      Notice.deleteMany({ eProceedingId: { $in: eProceedingIds } }),
+      EProceeding.deleteMany({ assesseeId }),
+      Demand.deleteMany({ assessee: assesseeId }),
+      Itr.deleteMany({ assessee: assesseeId }),
+      Audit.deleteMany({ assessee: assesseeId })
+    ]);
+
+    // Step 4: Delete S3 documents under the pan folder
+    const listParams = {
+      Bucket: bucketName,
+      Prefix: `${pan}/`
+    };
+
+    const listedObjects = await s3.listObjectsV2(listParams).promise();
+
+    if (listedObjects.Contents.length > 0) {
+      const deleteParams = {
+        Bucket: bucketName,
+        Delete: {
+          Objects: listedObjects.Contents.map(obj => ({ Key: obj.Key }))
+        }
+      };
+
+      await s3.deleteObjects(deleteParams).promise();
+      console.log(`🗑️ Deleted ${listedObjects.Contents.length} object(s) from S3 path: ${pan}/`);
+    }
+
+    // Step 5: Delete the Assessee
+    await Assessee.deleteOne({ _id: assesseeId });
+
+    // Step 6: Send response
+    res.status(200).json({
+      message: `Deleted assessee ${pan} and related records.`,
+      deleted: {
+        notices: deletedNotices.deletedCount,
+        eProceedings: deletedEProceedings.deletedCount,
+        demands: deletedDemands.deletedCount,
+        itrs: deletedItrs.deletedCount,
+        audits: deletedAudits.deletedCount,
+        s3Files: listedObjects.Contents.length
+      }
+    });
   } catch (error) {
-    console.error('Error deleting assessee:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error('❌ Error deleting assessee and related data:', error);
+    res.status(500).json({ message: 'Internal server error', error: error.message });
+  }
+});
+
+// DELETE all data in all collections
+app.delete('/delete-all-data', async (req, res) => {
+  try {
+    await Promise.all([
+      Assessee.deleteMany({}),
+      EProceeding.deleteMany({}),
+      Notice.deleteMany({}),
+      Demand.deleteMany({}),
+      Itr.deleteMany({}),
+      Audit.deleteMany({})
+    ]);
+
+    res.status(200).json({ message: 'All data deleted from all collections.' });
+  } catch (error) {
+    console.error('Error deleting data:', error);
+    res.status(500).json({ message: 'Failed to delete data', error: error.message });
+  }
+});
+
+
+
+app.get('/assessee-details', async (req, res) => {
+  try {
+    // Find all Assessees
+    const assessees = await Assessee.find().lean();
+
+    // For each assessee, fetch related data and attach
+    const detailedData = await Promise.all(assessees.map(async (assessee) => {
+      
+      // Fetch EProceedings related to this assessee
+      const eProceedings = await EProceeding.find({ assesseeId: assessee._id }).lean();
+
+      // For each EProceeding, fetch related Notices
+      const eProceedingsWithNotices = await Promise.all(eProceedings.map(async (ep) => {
+        const notices = await Notice.find({ eProceedingId: ep._id }).lean();
+        return { ...ep, notices };
+      }));
+
+      // Fetch Demands related to this assessee
+      const demands = await Demand.find({ assessee: assessee._id }).lean();
+
+      // Fetch ITRs related to this assessee
+      const itrs = await Itr.find({ assessee: assessee._id }).lean();
+
+      // Fetch Audits related to this assessee
+      const audits = await Audit.find({ assessee: assessee._id }).lean();
+
+      return {
+        ...assessee,
+        eProceedings: eProceedingsWithNotices,
+        demands,
+        itrs,
+        audits
+      };
+    }));
+
+    res.json({ success: true, data: detailedData });
+  } catch (error) {
+    console.error('Error fetching detailed assessee data:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+});
+
+app.get('/all-data', async (req, res) => {
+  try {
+    const [assessees, eProceedings, notices, demands, itrs, audits] = await Promise.all([
+      Assessee.find().lean(),
+      EProceeding.find().lean(),
+      Notice.find().lean(),
+      Demand.find().lean(),
+      Itr.find().lean(),
+      Audit.find().lean(),
+    ]);
+
+    res.json({
+      success: true,
+      data: {
+        assessees,
+        eProceedings,
+        notices,
+        demands,
+        itrs,
+        audits
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching all data:', error);
+    res.status(500).json({ success: false, message: 'Server error' });
   }
 });
 

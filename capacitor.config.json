@@ -1,0 +1,6 @@
+{
+  "appId": "com.soumyendudas.itrsathi",
+  "appName": "itrsathi",
+  "webDir": "ui/dist",
+  "bundledWebRuntime": false
+}

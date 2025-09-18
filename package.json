@@ -1,0 +1,16 @@
+{
+  "name": "itrsathi",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build:web": "cd ui && npm run build",
+    "cap:copy": "npx cap copy android",
+    "cap:sync": "npx cap sync android",
+    "android:assemble-debug": "cd android && chmod +x gradlew && ./gradlew assembleDebug",
+    "apk:debug": "npm run build:web && npm run cap:copy && npm run cap:sync && npm run android:assemble-debug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.4.3",
+    "@capacitor/ios": "^7.4.3"
+  }
+}

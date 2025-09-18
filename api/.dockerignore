@@ -1,4 +1,69 @@
-node_modules
-dist
-build
+# Node.js dependencies (will be installed in container)
+node_modules/
+npm-debug.log*
+
+# Environment files (use container environment variables instead)
 .env
+.env.local
+.env.development
+.env.test
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+docs/
+*.md
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Testing
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+
+# Build outputs (if any)
+dist/
+build/
+
+# Docker files
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Deployment files
+deploy.sh
+app.yaml
+.gcloudignore
+
+# Runtime generated files
+downloads/
+error_screenshot_*.png
+generated/
+
+# Supervisor config (no longer needed)
+supervisord.conf
