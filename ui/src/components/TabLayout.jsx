@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
-import { Home, Bell, Calendar, Settings, Sun, Moon, ChevronLeft, ChevronRight, FileSpreadsheet , LogOutIcon} from 'lucide-react';
+import { Home, Bell, Calendar, Settings, Sun, Moon, ChevronLeft, ChevronRight, FileSpreadsheet , LogOutIcon, Plus, LogOut, ArrowUpRight} from 'lucide-react';
 import { useAuth } from "../hooks/useAuth"; // adjust path
 
 const TabLayout = ({ children }) => {
@@ -19,7 +19,7 @@ const TabLayout = ({ children }) => {
 
   const { isDarkMode, toggleTheme, setLightMode } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
 
   const tabs = [
     { path: '/', icon: Home, label: 'Dashboard' },
@@ -27,9 +27,9 @@ const TabLayout = ({ children }) => {
     { path: '/calendar', icon: Calendar, label: 'Calendar' },
  
     { path: '/csv-editor', icon: FileSpreadsheet, label: 'CSV Editor' },
-     { path: '/settings', icon: Settings, label: 'Settings' },
+{ path: '/add-assessee', icon: Plus, label: 'Add Assessees' },
 
-          { icon: LogOutIcon, label: "Log Out", action: handleLogout },
+        
   ];
 
   const handleNavigation = (path) => {
@@ -53,7 +53,7 @@ const TabLayout = ({ children }) => {
  
           <div className="p-4 flex items-center justify-between">
             {isSidebarExpanded && (
-              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-800 transition-colors duration-200">Autotaxer</h1>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-800 transition-colors duration-200">ITR Sathi</h1>
             )}
             <button
               onClick={toggleSidebar}
@@ -98,7 +98,7 @@ const TabLayout = ({ children }) => {
           {isSidebarExpanded && <span className="truncate">{label}</span>}
         </button>
       );
-    }
+    }  
 
     // Regular nav link
     return (
@@ -115,10 +115,29 @@ const TabLayout = ({ children }) => {
       </Link>
     );
   })}
+
+  
 </nav>
           <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-          
+   <Link
+  to="/upgrade"
+  onClick={() => handleNavigation('/upgrade')}
+  className={`flex items-center px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 mt-2 ${
+    location.pathname === '/upgrade'
+      ? 'dark:bg-green-900/30 text-green-800 dark:text-green-200'
+      : 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20'
+  }`}
+>
+  <ArrowUpRight className="w-5 h-5 mr-0 shrink-0 text-green-500" />
+  {isSidebarExpanded && <span className="ml-3">Upgrade</span>}
+</Link>
           </div>
+
+
+
+
+
+
         </aside>
 
         {/* Mobile menu button */}
@@ -166,7 +185,10 @@ const TabLayout = ({ children }) => {
                 ))}
               </nav>
                
-              <button
+
+  
+
+              {/* <button
                 onClick={toggleTheme}
                 className="flex items-center w-full mt-4 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
               >
@@ -181,7 +203,7 @@ const TabLayout = ({ children }) => {
                     Dark Mode
                   </>
                 )}
-              </button>
+              </button> */}
             </div>
           </div>
         )}

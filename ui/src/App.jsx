@@ -5,20 +5,22 @@ import TabLayout from './components/TabLayout';
 import Dashboard from './pages/Dashboard';
 import Notices from './pages/Notices';
 import Calendar from './pages/Calendar';
-import Settings from './pages/Settings';
+import AddAssessee from './pages/AddAssessee';
 import CsvEditor from './pages/Csv-editor';
 import AssesseeCalendar from './pages/Calendar';
 import UserCalendar from './pages/Calendar';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Login from './components/Register/LoginForm';
 import ProtectedRoute from './components/ProtectedRoute';
+import SubscriptionPage from './pages/SubscriptionPage';
+import InvisibleNavbar from './components/Navbar/InvisibleNavbar';
 
 const queryClient = new QueryClient();
 function App() { 
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-
+  <InvisibleNavbar/>
          <QueryClientProvider client={queryClient}>   
         <BrowserRouter>
          
@@ -70,11 +72,11 @@ function App() {
                 }
               />
               <Route
-                path="/settings"
+                path="/add-assessee"
                 element={
                   <ProtectedRoute>
                     <TabLayout>
-                      <Settings />
+                      <AddAssessee />
                     </TabLayout>
                   </ProtectedRoute>
                 }/>
@@ -87,6 +89,16 @@ function App() {
                     </TabLayout>
                   </ProtectedRoute>}/>
 
+
+         <Route
+                path="/upgrade"
+                element={
+            
+                    <TabLayout>
+                      <SubscriptionPage />
+                    </TabLayout>
+               
+                }/>
 
             </Routes>
        

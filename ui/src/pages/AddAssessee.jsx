@@ -32,7 +32,7 @@ import axios from 'axios';
 
 import { useAuth } from '@/hooks/useAuth';
 
-export default function Settings() {
+export default function AddAssessee() {
   const [activeTab, setActiveTab] = useState('single');
   
   // Single entry states

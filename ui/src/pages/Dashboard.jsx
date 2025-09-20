@@ -70,53 +70,7 @@ useEffect(() => {
       [key]: !prev[key],
     }));
   };
-
-  // const syncNow = async () => {
-  //   if (!selectedAssessee?.pan || !selectedAssessee.password) return;
-  //   setLoading(true);
-  //   setProgress(0);
-  //   setStatus('⏳ Adding to sync queue...');
-  //   setShowProgress(true);
-
-  //   const { pan, password } = selectedAssessee;
-
-  //   try {
-  //     const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/addPan`, { pan, password });
-      
-  //     // Check if the response indicates success
-  //     if (res.status === 200) {
-  //       let percent = 0;
-  //       const interval = setInterval(() => {
-  //         percent += 10;
-  //         setProgress(percent);
-  //         if (percent >= 100) {
-  //           clearInterval(interval);
-  //           setLoading(false);
-  //           setStatus('✅ Added to sync queue successfully!');
-  //           setShowProgress(false);
-  //         }
-  //       }, 200);
-  //     } else {
-  //       setLoading(false);
-  //       setShowProgress(false);
-  //       setStatus('❌ Failed to add to queue. Try again.');
-  //     }
-  //   } catch (err) {
-  //     console.error(err);
-  //     setLoading(false);
-  //     setShowProgress(false);
-      
-  //     // Handle different error scenarios
-  //     if (err.response?.status === 400) {
-  //       setStatus('❌ Invalid PAN or password format');
-  //     } else if (err.response?.status === 409) {
-  //       setStatus('⚠️ PAN already exists in queue');
-  //     } else {
-  //       setStatus('❌ Failed: ' + (err.response?.data?.message || err.message));
-  //     }
-  //   }
-  // };
-
+ 
   const fullscreenStyle = {
     position: 'fixed',
     top: 0,
@@ -197,28 +151,7 @@ useEffect(() => {
             <div className="mt-4 p-4 bg-gray-800 border border-gray-700 rounded-lg shadow-xl space-y-2">
               <div className="text-gray-300"><strong className="text-white">Assessee Name:</strong> {selectedAssessee.name}</div>
               <div className="text-gray-300"><strong className="text-white">PAN:</strong> {selectedAssessee.pan}</div>
-              {/* {selectedAssessee.lastSyncedOn && (
-                <div className="text-sm text-red-400">
-                  Last synced on:{' '}
-                  <span className="font-semibold">
-                    {new Date(selectedAssessee.lastSyncedOn).toLocaleString()}
-                  </span>
-                </div>
-              )}
-              <button
-                onClick={syncNow}
-                disabled={loading}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors duration-200"
-              >
-                {loading ? (
-                  <>
-                    <LoaderCircle className="animate-spin" size={18} />
-                    Adding to queue...
-                  </>
-                ) : (
-                  'SYNC NOW'
-                )}
-              </button> */}
+        
 
               {showProgress && (
                 <div className="w-full bg-gray-700 rounded-full h-3 mt-2">
