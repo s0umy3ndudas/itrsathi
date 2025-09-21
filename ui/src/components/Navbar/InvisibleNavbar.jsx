@@ -29,6 +29,21 @@ const InvisibleNavbar = () => {
     console.log(`Clicked: ${action}`);
   };
 
+
+const handleLogout = () => {
+  try {
+    // Remove auth object (contains accessToken + user)
+    localStorage.removeItem("auth");
+
+    // Redirect to login page
+    window.location.href = "/login";
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
+
+
+
   return (
     <div className="fixed top-0 right-0 z-50">
       {/* Invisible Navbar */}
@@ -115,7 +130,7 @@ const InvisibleNavbar = () => {
                   <div className="border-t border-gray-700 my-2"></div>
 
                   <button
-                    onClick={() => handleMenuClick('logout')}
+                  onClick={handleLogout}
                     className="flex items-center gap-3 w-full px-4 py-2 text-left text-red-400 hover:bg-gray-800 transition-colors duration-200"
                   >
                     <LogOut className="w-4 h-4" />
