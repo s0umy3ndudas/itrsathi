@@ -21,7 +21,7 @@ export default function Footer() {
               <span className="text-xl font-bold text-white">ITR Sathi</span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed">
-              India's fastest and most secure ITR filing platform. File your returns with confidence.
+              India&apos;s fastest and most secure ITR filing platform. File your returns with confidence.
             </p>
           </div>
 
