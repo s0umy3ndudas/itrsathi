@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+
+# Block access to admin and private areas
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /dashboard/
+
+# Allow search engines to crawl important pages
+Allow: /
+Allow: /blogs/
+Allow: /pricing
+Allow: /contact
+Allow: /docs
+
+# Sitemap location
+Sitemap: https://www.itrsathi.in/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

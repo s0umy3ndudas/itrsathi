@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: '', dark: '.dark' } as const;
-const ResponsiveContainerAny = RechartsPrimitive.ResponsiveContainer as unknown as any;
 
 export type ChartConfig = {
   [k in string]: {
@@ -39,7 +38,9 @@ const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> & {
     config: ChartConfig;
-   children: React.ReactNode;
+    children: React.ComponentProps<
+      typeof RechartsPrimitive.ResponsiveContainer
+    >['children'];
   }
 >(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId();
@@ -57,9 +58,9 @@ const ChartContainer = React.forwardRef<
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-         <ResponsiveContainerAny>
-      {children}
-    </ResponsiveContainerAny>
+        <RechartsPrimitive.ResponsiveContainer>
+          {children}
+        </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
   );
