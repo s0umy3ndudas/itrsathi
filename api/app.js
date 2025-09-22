@@ -68,7 +68,7 @@ const { Redis } = require('@upstash/redis');
 
 // Basic test route
 app.get('/', (req, res) => {
-  res.send('Hello from Express!');
+  res.send('Hiello from Express!');
 });
 
 
