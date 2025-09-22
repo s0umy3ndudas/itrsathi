@@ -3,11 +3,13 @@ name: Build and Push Docker image
 on:
   push:
     branches:
-      - master   # build only when main branch updates
+      - main
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    env:
+      IMAGE: cyberrrnaut/itrsathi-api
 
     steps:
       - name: Checkout repository
@@ -25,9 +27,15 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push
+      - name: Build and push (multi-arch)
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: cyberrrnaut/itrsathi-api:latest
           platforms: linux/amd64,linux/arm64
+          # point to the api folder as the build context and the Dockerfile inside it
+          context: ./api
+          file: ./api/Dockerfile
+          # tags: latest + commit sha tag
+          tags: |
+            ${{ env.IMAGE }}:latest
+            ${{ env.IMAGE }}:sha-${{ github.sha }}
