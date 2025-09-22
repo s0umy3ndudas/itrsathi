@@ -32,10 +32,8 @@ jobs:
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          # point to the api folder as the build context and the Dockerfile inside it
           context: ./api
           file: ./api/Dockerfile
-          # tags: latest + commit sha tag
           tags: |
             ${{ env.IMAGE }}:latest
             ${{ env.IMAGE }}:sha-${{ github.sha }}
