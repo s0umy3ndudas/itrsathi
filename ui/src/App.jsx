@@ -14,11 +14,15 @@ import Login from './components/Register/LoginForm';
 import ProtectedRoute from './components/ProtectedRoute';
 import SubscriptionPage from './pages/SubscriptionPage';
 import InvisibleNavbar from './components/Navbar/InvisibleNavbar';
+import { Analytics } from "@vercel/analytics/next"
+
 
 const queryClient = new QueryClient();
 function App() { 
   return (
+    
     <ThemeProvider>
+      <Analytics />
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
   <InvisibleNavbar/>
          <QueryClientProvider client={queryClient}>   
